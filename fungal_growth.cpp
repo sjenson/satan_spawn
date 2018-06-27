@@ -30,23 +30,31 @@ class Fungus
 public:
     Fungus()
     {
-        tips.emplace_back(Hypha());
+        Hypha h1, h2, h3;
+        h1.position = {1, 0, 0};
+        h1.velocity = {1, 0, 0};
+        h2.position = {0, 1, 0};
+        h2.velocity = {0, 1, 0};
+        h3.position = {-1, 0, 0};
+        h3.velocity = {-1, 0, 0};
+        tips.push_back(h1);
+        tips.push_back(h2);
+        tips.push_back(h3);
     }
 
     void update()
     {
         for (auto& tip : tips)
         {
-            Point oldPos = tip.position;
+            points.push_back(tip.position);
             tip.position += tip.velocity;
-            segments.emplace_back(Segment(oldPos, tip.position));
-            std::cout << oldPos.transpose() << std::endl;
         }
     }
 
-    std::vector<Point3f> getPoints()
+    std::vector<Point3f> getNewPoints()
     {
-        std::vector<Point3f> simplePoints(points.size());
+        std::vector<Point3f> simplePoints;
+		simplePoints.reserve(points.size());
         for (const auto& point : points)
         {
             Point3f p;
@@ -55,6 +63,7 @@ public:
             p.z = point.z();
             simplePoints.push_back(p);
         }
+		points.clear();
 
         return simplePoints;
     }
@@ -78,5 +87,5 @@ EMSCRIPTEN_BINDINGS(fungus)
     class_<Fungus>("Fungus")
         .constructor<>()
         .function("update", &Fungus::update)
-        .function("getPoints", &Fungus::getPoints);
+        .function("getNewPoints", &Fungus::getNewPoints);
 };
